@@ -1,44 +1,37 @@
 /*
- * Session 1 — blink a plain LED (the homework, on real hardware).
+ * Session 2 — read the MPU-6050 and print CSV over serial at ~50 Hz.
  * --------------------------------------------------------------------------
- * The blink in src/main.cpp uses the board's addressable RGB LED, which you
- * send a COLOUR to. This one uses an ordinary LED from your box, which you
- * switch ON and OFF. It is the same idea with simpler hardware — and it is
- * the same sketch you ran in the simulator.
+ * Copy this into src/main.cpp. Sanity-check against physics you know:
+ *   flat on the table -> Z is about +9.8 (that's gravity!), X and Y near 0.
  *
- * WIRING (power off while you wire):
- *   GPIO40 -> resistor (220-330 ohm) -> LED long leg (anode)
- *   LED short leg (cathode) -> GND
- *
- *   THE RESISTOR IS NOT OPTIONAL. Straight across a pin, an LED draws more
- *   current than the pin should give. 220 ohm is bright, 330 is comfortable,
- *   1k works but is dim. Long leg = positive.
- *
- * WHY GPIO40: it's free on this board, it's not a strapping pin (avoid
- * GPIO0/3/45/46), and it's clear of the I2C bus (8/9), the session-1 scope
- * signal (GPIO2) and the octal flash/PSRAM pins (33-37). Session 2's homework
- * reuses the same pin, so you can leave the LED where it is.
- *
- * THE HOMEWORK: make this blink YOURS. A rhythm, a pattern, morse code, a
- * heartbeat — something you designed. Then push it as `FINAL: my blink`.
+ * Record a dataset (one file per gesture) from your laptop:
+ *   pio device monitor --quiet > wave_01.csv
+ * ...then upload the CSVs to Edge Impulse next session.
  */
 #include <Arduino.h>
+#include <Adafruit_MPU6050.h>
+#include <Wire.h>
 
-#define LED_PIN 40
+Adafruit_MPU6050 mpu;
 
 void setup() {
   Serial.begin(115200);
   delay(300);
-  pinMode(LED_PIN, OUTPUT);
-  Serial.println();
-  Serial.println("Plain LED blinking on GPIO40.");
+  Wire.begin(8, 9);                   // SDA 8, SCL 9
+
+  if (!mpu.begin()) {
+    Serial.println("MPU-6050 not found — run the I2C scanner first.");
+    while (true) delay(1000);
+  }
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
 }
 
-
 void loop() {
-  digitalWrite(LED_PIN, HIGH);   // on
-  delay(500);                    // <-- wait half a second
+  sensors_event_t a, g, t;
+  mpu.getEvent(&a, &g, &t);           // acceleration in m/s^2
 
-  digitalWrite(LED_PIN, LOW);    // off
-  delay(500);                    // <-- and again
+  Serial.printf("%.2f,%.2f,%.2f\n",
+                a.acceleration.x, a.acceleration.y, a.acceleration.z);
+
+  delay(200);                          // ~50 Hz — the rate you'll train AND deploy at
 }
