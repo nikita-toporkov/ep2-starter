@@ -5,7 +5,9 @@
  *   flat on the table -> Z is about +9.8 (that's gravity!), X and Y near 0.
  *
  * Record a dataset (one file per gesture) from your laptop:
- *   pio device monitor --quiet > wave_01.csv
+ *   python tools/record_csv.py wave_01.csv
+ * Close Serial Monitor first. Wait for GO; move until STOP (10 seconds).
+ * Use PlatformIO's Python; see README for Windows/Mac commands.
  * ...then upload the CSVs to Edge Impulse next session.
  */
 #include <Arduino.h>

@@ -1,11 +1,9 @@
 /*
- * Session 2 HOMEWORK — analog in, PWM out: make the knob dim the LED.
+ * Session 2 — knob dims LED: class starting point + homework.
  * --------------------------------------------------------------------------
- * This is the graded exercise for session 2:  FINAL: knob dims LED
- *
- * It is the smallest complete sense -> act loop in the whole course, and it is
- * the same shape as every project you will build: read something from the
- * world, decide a number, drive an output with it.
+ * IN CLASS: copy into src/main.cpp, wire, build and test.
+ * Commit and push as SETUP: knob works (ungraded save point).
+ * The unchanged example is the starting point for the homework below.
  *
  * WIRING (power off while you wire):
  *   pot outer leg 1 -> 3V3
@@ -34,11 +32,29 @@
  * analogWrite() takes LEDC channels counting down from the top, and the scope
  * signal holds channel 0. They coexist.
  *
- * MAKE IT YOURS — that is the actual assignment:
- *   - invert it, so turning the knob up makes the LED dimmer
- *   - add a dead zone, so the bottom tenth of the travel is fully off
- *   - drive the buzzer instead of the LED (same idea, noisier)
- *   - print the raw value and the duty side by side and watch them track
+ * HOMEWORK — tilt switches, knob dims:
+ *   Combine this example with examples/session02_mpu_read.cpp in src/main.cpp.
+ *   Keep one setup() and one loop(), and keep your working platformio.ini.
+ *   MPU wiring: 3V3, GND, SDA GPIO8, SCL GPIO9. Keep the LED and pot above.
+ *
+ *   1. Choose one accelerometer axis. With its positive direction pointing up,
+ *      enable the LED; held sideways or down, turn the LED off.
+ *      Read the acceleration in those poses and choose a threshold between
+ *      them. Judge orientation while held still, not during a shake.
+ *   2. While enabled, the pot sets brightness. While disabled, the LED stays
+ *      off at every knob setting. The existing raw / 16 mapping is fine.
+ *   3. Test up -> sideways -> down -> up, plus two knob settings while enabled.
+ *      Use a nonzero knob setting when checking the orientation switch.
+ *   4. Add three comment lines at the top of src/main.cpp:
+ *      - My chosen axis and threshold.
+ *      - The readings I observed in the three poses.
+ *      - One thing that surprised me when testing.
+ *   5. Commit and push as FINAL: tilt switches, knob dims.
+ *      Submit that commit's link in Moodle with your AI-use line.
+ *
+ *   Both controls must work; a brightness curve or perfectly flicker-free
+ *   switching is not required. Optional: reduce flicker near the threshold.
+ *   The unchanged knob-only example below is the class starting point.
  */
 #include <Arduino.h>
 
