@@ -5,7 +5,9 @@
  *   flat on the table -> Z is about +9.8 (that's gravity!), X and Y near 0.
  *
  * Record a dataset (one file per gesture) from your laptop:
- *   pio device monitor --quiet > wave_01.csv
+ *   python tools/record_csv.py wave_01.csv
+ * Close Serial Monitor first. Wait for GO; move until STOP (10 seconds).
+ * Use PlatformIO's Python; see README for Windows/Mac commands.
  * ...then upload the CSVs to Edge Impulse next session.
  */
 #include <Arduino.h>
@@ -13,6 +15,9 @@
 #include <Wire.h>
 
 Adafruit_MPU6050 mpu;
+
+#define POT_PIN 4
+#define LED_PIN 40
 
 void setup() {
   Serial.begin(115200);
@@ -33,5 +38,19 @@ void loop() {
   Serial.printf("%.2f,%.2f,%.2f\n",
                 a.acceleration.x, a.acceleration.y, a.acceleration.z);
 
-  delay(200);                          // ~50 Hz — the rate you'll train AND deploy at
+  delay(20);                          // ~50 Hz — the rate you'll train AND deploy at
+
+
+
+  if (a.acceleration.x > 0) {
+    Serial.println("X-axis acceleration exceeded 0 m/s^2!");    
+    int raw  = analogRead(POT_PIN);         // 0 .. 4095
+    int duty = raw / 16;                    // 0 .. 255
+    if (duty > 255) duty = 255;             // guard the top end of the range
+
+    analogWrite(LED_PIN, duty);;
+  }
+  else {
+    analogWrite(LED_PIN, 0);               // turn off LED if condition not met
+  }
 }
